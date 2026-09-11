@@ -1,0 +1,32 @@
+/* Styles globaux WoutJob */
+@use "bootstrap/scss/bootstrap" as *;
+@use "bootstrap-icons/font/bootstrap-icons.css" as *;
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: #f5f6fa;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial,
+    sans-serif;
+}
+
+.offre-card {
+  transition: box-shadow 0.15s ease;
+}
+
+.offre-card:hover {
+  box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.08);
+}
+
+.text-truncate-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  color: #4b5563;
+  font-size: 0.925rem;
+}

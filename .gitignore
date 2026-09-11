@@ -1,0 +1,30 @@
+# Monorepo WoutJob
+
+# --- Backend (Laravel) ---
+/backend/vendor
+/backend/node_modules
+/backend/.env
+/backend/.env.backup
+/backend/.phpunit.result.cache
+/backend/storage/*.key
+/backend/storage/framework/cache/*
+/backend/storage/framework/sessions/*
+/backend/storage/framework/views/*
+/backend/storage/logs/*
+/backend/public/build
+/backend/public/storage
+/backend/bootstrap/cache/*.php
+/backend/database/database.sqlite
+
+# --- Frontend (Angular) ---
+/frontend/node_modules
+/frontend/dist
+/frontend/.angular
+/frontend/.vscode/*
+!/frontend/.vscode/extensions.json
+
+# --- Divers ---
+.DS_Store
+Thumbs.db
+*.log
+/.idea

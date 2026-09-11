@@ -1,0 +1,43 @@
+@if (chargement()) {
+  <div class="text-center py-5"><span class="spinner-border"></span></div>
+} @else if (offre(); as o) {
+  <a routerLink="/recherche" class="btn btn-light mb-3"><i class="bi bi-arrow-left me-1"></i>Retour</a>
+
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-4">
+      <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+        <div>
+          <h1 class="h3 mb-1">{{ o.titre }}</h1>
+          <div class="text-muted">
+            @if (o.entreprise) { {{ o.entreprise }} · }
+            @if (o.lieu) { {{ o.lieu }} · }
+            @if (o.date_publication) { publiée le {{ o.date_publication | date: 'dd/MM/yyyy' }} }
+          </div>
+        </div>
+        <app-type-contrat-badge [type]="o.type_contrat" />
+      </div>
+
+      <div class="d-flex gap-2 mt-3 mb-4">
+        <a [href]="o.url_source" target="_blank" rel="noopener" class="btn btn-primary">
+          Voir l'annonce originale <i class="bi bi-box-arrow-up-right ms-1"></i>
+        </a>
+        <button class="btn btn-outline-primary" (click)="ajouterFavori()">
+          <i class="bi bi-star me-1"></i>Ajouter aux favoris
+        </button>
+      </div>
+
+      <hr>
+
+      @if (o.description_html) {
+        <div [innerHTML]="o.description_html"></div>
+      } @else {
+        <p class="text-muted">{{ o.description_texte }}</p>
+      }
+
+      <p class="text-muted small mt-4 mb-0">
+        Source : {{ o.source?.nom }} — cette page reprend un extrait ; consultez l'annonce
+        originale pour postuler.
+      </p>
+    </div>
+  </div>
+}

@@ -1,0 +1,76 @@
+<h1 class="h3 mb-1">Sources</h1>
+<p class="text-muted mb-4">
+  Transparence sur le scraping : d'où viennent les offres, quand chaque site a été
+  vérifié pour la dernière fois. Le scraping ne se déclenche jamais depuis cette page
+  — uniquement en ligne de commande, à intervalles raisonnables.
+</p>
+
+@if (stats(); as s) {
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm"><div class="card-body">
+        <div class="text-muted small text-uppercase">Offres actives</div>
+        <div class="h3 mb-0">{{ s.offres_actives }}</div>
+      </div></div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm"><div class="card-body">
+        <div class="text-muted small text-uppercase">Sources actives</div>
+        <div class="h3 mb-0">{{ s.sources_actives }}</div>
+      </div></div>
+    </div>
+  </div>
+}
+
+@if (chargement()) {
+  <div class="text-center py-5"><span class="spinner-border"></span></div>
+} @else {
+  <div class="row g-3">
+    @for (source of sources(); track source.id) {
+      <div class="col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <h2 class="h5 mb-0">{{ source.nom }}</h2>
+                <a [href]="source.url_base" target="_blank" rel="noopener" class="small text-muted">
+                  {{ source.url_base }}
+                </a>
+              </div>
+              @if (source.actif) {
+                <span class="badge text-bg-success">active</span>
+              } @else {
+                <span class="badge text-bg-light">phase 2</span>
+              }
+            </div>
+
+            <div class="mt-3 small text-muted">
+              {{ source.offres_count ?? 0 }} offre(s) active(s) ·
+              @if (source.dernier_scrape_at) {
+                dernier scrape le {{ source.dernier_scrape_at | date: 'dd/MM/yyyy HH:mm' }}
+              } @else {
+                jamais scrapée
+              }
+            </div>
+
+            @if (source.scrape_runs && source.scrape_runs.length > 0) {
+              <hr>
+              <div class="small text-muted text-uppercase mb-2">Dernières exécutions</div>
+              <ul class="list-unstyled small mb-0">
+                @for (run of source.scrape_runs; track run.id) {
+                  <li class="d-flex justify-content-between mb-1">
+                    <span>{{ run.demarre_at | date: 'dd/MM HH:mm' }}</span>
+                    <span>
+                      {{ run.offres_nouvelles }} nouvelle(s), {{ run.offres_maj }} maj
+                      <span class="badge ms-1" [class]="couleurStatut(run.statut)">{{ run.statut }}</span>
+                    </span>
+                  </li>
+                }
+              </ul>
+            }
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+}

@@ -1,0 +1,152 @@
+<div class="row g-4">
+  <div class="col-12">
+    <div class="input-group input-group-lg shadow-sm">
+      <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+      <input
+        type="search"
+        class="form-control"
+        placeholder="Titre, entreprise, mot-clé…"
+        [value]="q()"
+        (input)="q.set($any($event.target).value)"
+        (keyup.enter)="soumettreRecherche()"
+      />
+      <button class="btn btn-primary" (click)="soumettreRecherche()">Rechercher</button>
+    </div>
+  </div>
+
+  <div class="col-lg-3">
+    @if (resultat(); as r) {
+      <div class="card border-0 shadow-sm mb-3">
+        <div class="card-body">
+          <h2 class="h6 text-muted text-uppercase mb-3">Type de contrat</h2>
+          @for (entry of entriesDe(r.facettes.type_contrat); track entry[0]) {
+            <button
+              class="btn btn-sm w-100 text-start mb-1"
+              [class.btn-primary]="typeContrat() === entry[0]"
+              [class.btn-light]="typeContrat() !== entry[0]"
+              (click)="basculerFiltre(typeContrat, entry[0])"
+            >
+              <span class="text-capitalize">{{ entry[0] }}</span>
+              <span class="float-end text-muted">{{ entry[1] }}</span>
+            </button>
+          }
+        </div>
+      </div>
+
+      <div class="card border-0 shadow-sm mb-3">
+        <div class="card-body">
+          <h2 class="h6 text-muted text-uppercase mb-3">Lieu</h2>
+          @for (entry of entriesDe(r.facettes.lieu); track entry[0]) {
+            <button
+              class="btn btn-sm w-100 text-start mb-1"
+              [class.btn-primary]="lieu() === entry[0]"
+              [class.btn-light]="lieu() !== entry[0]"
+              (click)="basculerFiltre(lieu, entry[0])"
+            >
+              {{ entry[0] }}
+              <span class="float-end text-muted">{{ entry[1] }}</span>
+            </button>
+          }
+          @if (entriesDe(r.facettes.lieu).length === 0) {
+            <p class="text-muted small mb-0">Aucun lieu détecté sur ces offres.</p>
+          }
+        </div>
+      </div>
+
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <h2 class="h6 text-muted text-uppercase mb-3">Catégorie</h2>
+          @for (entry of entriesDe(r.facettes.categorie); track entry[0]) {
+            <button
+              class="btn btn-sm w-100 text-start mb-1"
+              [class.btn-primary]="categorie() === entry[0]"
+              [class.btn-light]="categorie() !== entry[0]"
+              (click)="basculerFiltre(categorie, entry[0])"
+            >
+              {{ entry[0] }}
+              <span class="float-end text-muted">{{ entry[1] }}</span>
+            </button>
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+  <div class="col-lg-9">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <div class="text-muted small">
+        @if (resultat(); as r) { {{ r.total }} offre(s) trouvée(s) }
+      </div>
+      <div class="btn-group btn-group-sm">
+        <button
+          class="btn"
+          [class.btn-primary]="tri() === 'recent'"
+          [class.btn-outline-secondary]="tri() !== 'recent'"
+          (click)="changerTri('recent')"
+        >
+          Plus récentes
+        </button>
+        <button
+          class="btn"
+          [class.btn-primary]="tri() === 'pertinence'"
+          [class.btn-outline-secondary]="tri() !== 'pertinence'"
+          (click)="changerTri('pertinence')"
+        >
+          Pertinence
+        </button>
+      </div>
+    </div>
+
+    @if (chargement()) {
+      <div class="text-center py-5"><span class="spinner-border"></span></div>
+    } @else if (resultat(); as r) {
+      @if (r.donnees.length === 0) {
+        <div class="alert alert-light border">Aucune offre ne correspond à ces critères.</div>
+      } @else {
+        <div class="d-flex flex-column gap-3">
+          @for (offre of r.donnees; track offre.id) {
+            <div class="card border-0 shadow-sm offre-card">
+              <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                  <div>
+                    <a [routerLink]="['/offres', offre.id]" class="h5 text-decoration-none">
+                      {{ offre.titre }}
+                    </a>
+                    <div class="text-muted small mt-1">
+                      @if (offre.entreprise) { {{ offre.entreprise }} · }
+                      @if (offre.lieu) { {{ offre.lieu }} }
+                    </div>
+                  </div>
+                  <app-type-contrat-badge [type]="offre.type_contrat" />
+                </div>
+                <p class="mt-2 mb-2 text-truncate-3">{{ offre.description_texte }}</p>
+                <div class="d-flex justify-content-between align-items-center">
+                  <a [href]="offre.url_source" target="_blank" rel="noopener" class="small">
+                    Voir l'annonce originale <i class="bi bi-box-arrow-up-right"></i>
+                  </a>
+                  <button class="btn btn-sm btn-outline-primary" (click)="ajouterFavori(offre)">
+                    <i class="bi bi-star me-1"></i>Favoris
+                  </button>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mt-4">
+          <button class="btn btn-outline-secondary" [disabled]="page() <= 1" (click)="pagePrecedente()">
+            <i class="bi bi-arrow-left"></i> Précédent
+          </button>
+          <span class="text-muted small">Page {{ page() }} / {{ totalPages(r) }}</span>
+          <button
+            class="btn btn-outline-secondary"
+            [disabled]="page() >= totalPages(r)"
+            (click)="pageSuivante()"
+          >
+            Suivant <i class="bi bi-arrow-right"></i>
+          </button>
+        </div>
+      }
+    }
+  </div>
+</div>

@@ -1,0 +1,97 @@
+<div class="d-flex gap-2 align-items-center mb-3">
+  <h1 class="h3 mb-0 me-auto">Mes recherches sauvegardées</h1>
+  <button class="btn btn-primary" (click)="ouvrirCreation()">
+    <i class="bi bi-plus-lg me-1"></i>Nouvelle recherche
+  </button>
+</div>
+
+<p class="text-muted">
+  Une alerte par e-mail est envoyée (quotidienne ou hebdomadaire) quand une nouvelle offre
+  correspond à vos critères. Le contenu de l'e-mail est visible dans les logs du serveur en
+  développement (pas d'envoi SMTP réel configuré).
+</p>
+
+@if (chargement()) {
+  <div class="text-center py-5"><span class="spinner-border"></span></div>
+} @else if (recherches().length === 0) {
+  <div class="alert alert-light border">Aucune recherche sauvegardée pour l'instant.</div>
+} @else {
+  <div class="row g-3">
+    @for (r of recherches(); track r.id) {
+      <div class="col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start">
+              <h2 class="h5">{{ r.nom }}</h2>
+              <span class="badge text-bg-light text-capitalize">{{ r.frequence_alerte }}</span>
+            </div>
+            <ul class="list-unstyled small text-muted mb-3">
+              @if (r.mots_cles) { <li>Mots-clés : {{ r.mots_cles }}</li> }
+              @if (r.lieu) { <li>Lieu : {{ r.lieu }}</li> }
+              @if (r.type_contrat) { <li>Type : {{ r.type_contrat }}</li> }
+              @if (r.categorie) { <li>Catégorie : {{ r.categorie }}</li> }
+              @if (r.derniere_alerte_envoyee_at) {
+                <li>Dernière vérification : {{ r.derniere_alerte_envoyee_at | date: 'dd/MM/yyyy HH:mm' }}</li>
+              }
+            </ul>
+            <div class="d-flex gap-2">
+              <button class="btn btn-sm btn-outline-secondary" (click)="ouvrirEdition(r)">
+                <i class="bi bi-pencil me-1"></i>Modifier
+              </button>
+              <button class="btn btn-sm btn-outline-danger" (click)="supprimer(r)">
+                <i class="bi bi-trash me-1"></i>Supprimer
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+}
+
+<app-modal
+  [ouvert]="modalOuvert()"
+  [titre]="editionId() ? 'Modifier la recherche' : 'Nouvelle recherche sauvegardée'"
+  (fermer)="modalOuvert.set(false)"
+>
+  <form [formGroup]="form" id="form-recherche" (ngSubmit)="enregistrer()">
+    <div class="mb-3">
+      <label class="form-label">Nom de la recherche *</label>
+      <input class="form-control" formControlName="nom" placeholder="Ex: Stage dev à Dakar" />
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Mots-clés</label>
+      <input class="form-control" formControlName="mots_cles" />
+    </div>
+    <div class="row g-2 mb-3">
+      <div class="col-6">
+        <label class="form-label">Lieu</label>
+        <input class="form-control" formControlName="lieu" placeholder="Ex: Dakar" />
+      </div>
+      <div class="col-6">
+        <label class="form-label">Type de contrat</label>
+        <select class="form-select" formControlName="type_contrat">
+          <option value="">— Tous —</option>
+          <option value="emploi">Emploi</option>
+          <option value="stage">Stage</option>
+          <option value="alternance">Alternance</option>
+          <option value="autre">Autre</option>
+        </select>
+      </div>
+    </div>
+    <div class="mb-0">
+      <label class="form-label">Fréquence d'alerte</label>
+      <select class="form-select" formControlName="frequence_alerte">
+        <option value="quotidienne">Quotidienne</option>
+        <option value="hebdomadaire">Hebdomadaire</option>
+        <option value="desactivee">Désactivée</option>
+      </select>
+    </div>
+  </form>
+  <div pied>
+    <button class="btn btn-light" (click)="modalOuvert.set(false)">Annuler</button>
+    <button class="btn btn-primary" form="form-recherche" type="submit" [disabled]="enregistrement()">
+      Enregistrer
+    </button>
+  </div>
+</app-modal>

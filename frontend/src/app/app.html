@@ -1,0 +1,22 @@
+<router-outlet />
+
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1200">
+  @for (n of notifications.liste(); track n.id) {
+    <div
+      class="toast show align-items-center border-0 mb-2 text-white"
+      [class.bg-success]="n.type === 'succes'"
+      [class.bg-danger]="n.type === 'erreur'"
+      [class.bg-secondary]="n.type === 'info'"
+      role="alert"
+    >
+      <div class="d-flex">
+        <div class="toast-body">{{ n.message }}</div>
+        <button
+          type="button"
+          class="btn-close btn-close-white me-2 m-auto"
+          (click)="notifications.fermer(n.id)"
+        ></button>
+      </div>
+    </div>
+  }
+</div>
