@@ -27,6 +27,24 @@ class ExtractionHeuristiques
         'Pikine', 'Guédiawaye', 'Dakar Plateau',
     ];
 
+    /**
+     * `Crawler::attr('href')` renvoie l'attribut brut, jamais résolu contre
+     * l'URL de la page (contrairement à `Crawler::link()`, qui exige un
+     * Crawler construit avec l'URI de base — pas garanti ici puisqu'on
+     * reconstruit un Crawler par nœud). Les deux sites cibles utilisent des
+     * liens relatifs ("/mon-article/") : sans cette résolution, l'URL
+     * stockée est cassée (lien "voir l'annonce" mort) et la page de détail
+     * ne peut plus être récupérée (échec silencieux -> description vide).
+     */
+    public static function urlAbsolue(string $url, string $base): string
+    {
+        if (str_starts_with($url, 'http://') || str_starts_with($url, 'https://')) {
+            return $url;
+        }
+
+        return rtrim($base, '/').'/'.ltrim($url, '/');
+    }
+
     public static function datePublication(Crawler $page): ?CarbonInterface
     {
         $noeud = $page->filter('meta[property="article:published_time"]');

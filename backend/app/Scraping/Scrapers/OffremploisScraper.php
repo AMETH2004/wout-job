@@ -67,6 +67,7 @@ class OffremploisScraper implements SourceScraper
         if (! $titre || ! $url) {
             return null;
         }
+        $url = Extraction::urlAbsolue($url, 'https://offremplois.com');
 
         $categories = $item->filter('.cat-info-el')->each(fn (Crawler $n) => trim($n->text('')));
 

@@ -66,6 +66,7 @@ class JobSenegalScraper implements SourceScraper
         if (! $titre || ! $url) {
             return null;
         }
+        $url = Extraction::urlAbsolue($url, 'https://jobsenegal.com');
 
         $categories = $article->filter('.cat-info-el')->each(fn (Crawler $n) => trim($n->text('')));
 
